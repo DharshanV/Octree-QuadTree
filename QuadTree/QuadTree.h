@@ -75,7 +75,7 @@ public:
 		SE->insert(point);
 	}
 
-	void searchArea(const Boundary& boundary,list<Point>& searchPoints) {
+	void searchArea(const Boundary& boundary, list<Point>& searchPoints) {
 		if (!bound.intersects(boundary)) return;
 		for (Point& p : points) {
 			if (boundary.contains(p)) searchPoints.push_back(p);
@@ -87,16 +87,39 @@ public:
 		SE->searchArea(boundary, searchPoints);
 	}
 
-	void draw(sf::RenderWindow& window) {
-		window.draw(getBox());
-		for (Point& p : points) {
-			window.draw(getPoint(p));
-		}
+	void getBoxs(vector<sf::Vertex>& quadTree, sf::Color color) {
+		float topX = bound.topLeft.x;
+		float topY = bound.topLeft.y;
+		float bottomX = bound.bottomRight.x;
+		float bottomY = bound.bottomRight.y;
+		float dw = fabs(topX - bottomX);
+		float dh = fabs(topY - bottomY);
+
+		quadTree.push_back(sf::Vertex(sf::Vector2f(topX,topY), color));
+		quadTree.push_back(sf::Vertex(sf::Vector2f(topX+dw,topY), color));
+
+		quadTree.push_back(sf::Vertex(sf::Vector2f(topX + dw, topY), color));
+		quadTree.push_back(sf::Vertex(sf::Vector2f(topX + dw, topY+dh), color));
+
+		quadTree.push_back(sf::Vertex(sf::Vector2f(topX + dw, topY + dh), color));
+		quadTree.push_back(sf::Vertex(sf::Vector2f(topX, topY+dh), color));
+
+		quadTree.push_back(sf::Vertex(sf::Vector2f(topX, topY + dh), color));
+		quadTree.push_back(sf::Vertex(sf::Vector2f(topX, topY), color));
 		if (!divided) return;
-		NW->draw(window);
-		NE->draw(window);
-		SW->draw(window);
-		SE->draw(window);
+		NW->getBoxs(quadTree, color);
+		NE->getBoxs(quadTree, color);
+		SW->getBoxs(quadTree, color);
+		SE->getBoxs(quadTree, color);
+	}
+
+	void drawBox(sf::RenderWindow& window) {
+		window.draw(getBox());
+		if (!divided) return;
+		NW->drawBox(window);
+		NE->drawBox(window);
+		SW->drawBox(window);
+		SE->drawBox(window);
 	}
 
 	sf::RectangleShape getBox() {
@@ -110,13 +133,6 @@ public:
 		box.setFillColor(sf::Color::Transparent);
 		box.setOutlineThickness(boxOutlineSize);
 		return box;
-	}
-
-	sf::CircleShape getPoint(const Point& point) {
-		sf::CircleShape circle(dotRadius);
-		circle.setOrigin(-sf::Vector2f(point.x- dotRadius, point.y- dotRadius));
-		circle.setFillColor(sf::Color::Red);
-		return circle;
 	}
 
 	void subdivide(const Point& point) {
@@ -153,7 +169,6 @@ private:
 	QuadTree* SW;
 	QuadTree* SE;
 	bool divided;
-	float boxOutlineSize = 1;
-	float dotRadius = 3;
+	float boxOutlineSize = 0.5;
 };
 
