@@ -4,7 +4,61 @@
 #include "QuadTree.h"
 using namespace std;
 using namespace sf;
+struct Ray {
+public:
+	Ray(const Vector2f& orig, const Vector2f& dir) :
+		orig(orig), dir(dir) {
+
+	}
+
+	void setDir(const Vector2f& dir) {
+		this->dir = dir;
+	}
+
+	void draw(RenderWindow& window) {
+		Vertex line[2];
+		line[0] = Vertex(orig);
+		line[1] = Vertex(orig + dir);
+		window.draw(line, 2, Lines);
+	}
+	Vector2f orig, dir;
+};
+
 void processEvents(RenderWindow& window);
+Vector2f normalize(const Vector2f& v);
+bool intersect(const Boundary& box, const Ray &r);
+
+float width = 500;
+float height = 500;
+float mouseX = 0;
+float mouseY = 0;
+
+int main() {
+	sf::ContextSettings settings;
+	settings.antialiasingLevel = 5;
+	sf::RenderWindow window(sf::VideoMode(width, height), "QuadTree",sf::Style::Default, settings);
+
+	float size = 30;
+	Boundary box(Point(width / 2 - size, height / 2 - size), Point(width / 2 + size, height / 2 + size));
+	Vector2f rayPosition(width / 2, height - 10);
+	Ray ray(rayPosition,Vector2f(0,0));
+
+	while (window.isOpen()) {
+		processEvents(window);
+
+		Vector2f dir = rayPosition - Vector2f(mouseX, mouseY);
+		ray.setDir(-dir);
+		printf("Intersects: %d\n", intersect(box, ray));
+
+		window.clear();
+		box.draw(window);
+		ray.draw(window);
+		window.display();
+	}
+	return 0;
+}
+
+/*
 float random(float min, float max);
 void createParticle(vector<Vertex>& vertex, float x, float y, float size, Color color);
 void getParticles(const list<Point>& points, vector<Vertex>& vertexArray, float particleSize, Color color);
@@ -18,7 +72,6 @@ Boundary searchArea;
 RectangleShape searchBox;
 bool renderBoxes = false;
 
-int main() {
 	srand(time(0));
 	sf::RenderWindow window(sf::VideoMode(width, height), "QuadTree");
 
@@ -68,8 +121,6 @@ int main() {
 		window.display();
 		searchParticles.clear();
 	}
-	return 0;
-}
 
 float random(float min, float max) {
 	return (float)(rand() % (int)max + min);
@@ -123,4 +174,52 @@ void getParticles(const list<Point>& points,vector<Vertex>& vertexArray,float pa
 	for (const Point& p : points) {
 		createParticle(vertexArray, p.x, p.y, particleSize, color);
 	}
+}
+*/
+
+void processEvents(RenderWindow& window) {
+	sf::Event event;
+	window.pollEvent(event);
+	if (event.type == Event::Closed) {
+		window.close();
+	}
+	if (event.type == Event::KeyReleased) {
+		if (event.key.code == sf::Keyboard::Escape) {
+			window.close();
+		}
+	}
+	if (event.type == Event::MouseMoved) {
+		mouseX = event.mouseMove.x;
+		mouseY = event.mouseMove.y;
+	}
+}
+
+Vector2f normalize(const Vector2f& v) {
+	float l = sqrtf(v.x*v.x + v.y*v.y);
+	return v / l;
+}
+
+bool intersect(const Boundary& box,const Ray &r) {
+	Point min = box.topLeft;
+	Point max = box.bottomRight;
+
+	float tmin = (min.x - r.orig.x) / r.dir.x;
+	float tmax = (max.x - r.orig.x) / r.dir.x;
+
+	if (tmin > tmax) swap(tmin, tmax);
+
+	float tymin = (min.y - r.orig.y) / r.dir.y;
+	float tymax = (max.y - r.orig.y) / r.dir.y;
+
+	if (tymin > tymax) swap(tymin, tymax);
+
+	if ((tmin > tymax) || (tymin > tmax))
+		return false;
+
+	if (tymin > tmin)
+		tmin = tymin;
+
+	if (tymax < tmax)
+		tmax = tymax;
+	return true;
 }

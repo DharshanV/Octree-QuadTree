@@ -20,6 +20,7 @@ public:
 		topLeft(topLeft),bottomRight(bottomRight) {
 
 	}
+
 	bool contains(const Point& point) const {
 		if ((point.x >= topLeft.x && point.x <= bottomRight.x) &&
 			(point.y >= topLeft.y && point.y <= bottomRight.y)) {
@@ -41,6 +42,16 @@ public:
 
 	float getHeight() {
 		return fabs(topLeft.y - bottomRight.y);
+	}
+
+	void draw(sf::RenderWindow& window) {
+		float sizeX = fabs(topLeft.x - bottomRight.x);
+		float sizeY = fabs(topLeft.y - bottomRight.y);
+		sf::RectangleShape box(sf::Vector2f(sizeX, sizeY));
+		box.setPosition(topLeft.x, topLeft.y);
+		box.setFillColor(sf::Color::Transparent);
+		box.setOutlineThickness(2);
+		window.draw(box);
 	}
 
 	Point topLeft;
