@@ -7,4 +7,4 @@ A spatial data structure to accelerate data look up. Useful for ray tracing wher
 | ------------- | ------------- | ------------- |
 | ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example1.gif)  | ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example2.gif)  | ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example3.gif)|
 | Line (Ray) Intersection |
-| ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example4.gif)|
+| ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example5.gif)|
