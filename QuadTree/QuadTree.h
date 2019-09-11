@@ -2,16 +2,10 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <list>
+#include "Point.h"
 typedef unsigned int uint;
 using namespace std;
-
-struct Point {
-public:
-	Point() : x(0), y(0) {}
-	Point(float x, float y) : x(x), y(y) {}
-	float x;
-	float y;
-};
+using namespace sf;
 
 struct Boundary {
 public:
@@ -30,9 +24,9 @@ public:
 	}
 
 	bool intersects(const Boundary& boundary) {
-		return (topLeft.x < boundary.bottomRight.x) && 
+		return (topLeft.x < boundary.bottomRight.x) &&
 			(bottomRight.x > boundary.topLeft.x) &&
-			(topLeft.y < boundary.bottomRight.y) && 
+			(topLeft.y < boundary.bottomRight.y) &&
 			(bottomRight.y > boundary.topLeft.y);
 	}
 
@@ -60,6 +54,14 @@ public:
 
 class QuadTree {
 public:
+	QuadTree() {
+		divided = false;
+		NW = NULL;
+		NE = NULL;
+		SW = NULL;
+		SE = NULL;
+	}
+
 	QuadTree(const Boundary& bound, uint maxCount) :
 		bound(bound),maxCount(maxCount) {
 		points.reserve(maxCount);
@@ -153,8 +155,8 @@ public:
 		float dh = fabs(bound.topLeft.y - bound.bottomRight.y) / 2;
 
 		NWB = Boundary(bound.topLeft, Point(bound.topLeft.x + dw, bound.topLeft.y + dh));
-		NEB = Boundary(Point(bound.topLeft.x+dw, bound.topLeft.y), Point(bound.topLeft.x + dw*2, bound.topLeft.y + dh));
-		SWB = Boundary(Point(bound.topLeft.x , bound.topLeft.y + dh), Point(bound.topLeft.x + dw, bound.topLeft.y + dh * 2));
+		NEB = Boundary(Point(bound.topLeft.x + dw, bound.topLeft.y), Point(bound.topLeft.x + dw * 2, bound.topLeft.y + dh));
+		SWB = Boundary(Point(bound.topLeft.x, bound.topLeft.y + dh), Point(bound.topLeft.x + dw, bound.topLeft.y + dh * 2));
 		SEB = Boundary(Point(bound.topLeft.x + dw, bound.topLeft.y + dh), bound.bottomRight);
 
 		NW = new QuadTree(NWB, maxCount);
@@ -164,6 +166,23 @@ public:
 		divided = true;
 	}
 
+	const Boundary* getBound() const {
+		return &bound;
+	}
+
+	const vector<Point>* getPoints() const {
+		return &points;
+	}
+
+	bool subdivided() const{
+		return divided;
+	}
+
+	QuadTree* getNW() const { return NW; };
+	QuadTree* getNE() const { return NE; };
+	QuadTree* getSW() const { return SW; };
+	QuadTree* getSE() const { return SE; };
+	 
 	~QuadTree() {
 		if (!divided) return;
 		delete NW;
