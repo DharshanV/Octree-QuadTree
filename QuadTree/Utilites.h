@@ -77,13 +77,28 @@ void getSelectedParticles(const QuadTree& tree, const Line& line, vector<Vertex>
 	if (!intersect(treeBounds->topLeft, treeBounds->bottomRight, line.p1, line.p2, hit)) return;
 	const vector<Point>* points = tree.getPoints();
 	for (const Point& p : *points) {
-		if (intersect(getPoint(p.x, p.y, -size), getPoint(p.x, p.y, size), line.p1, line.p2, hit)) {
-			createParticle(vertices, p.x, p.y, size, color);
-		}
+		createParticle(vertices, p.x, p.y, size, color);
+		//if (intersect(getPoint(p.x, p.y, -size), getPoint(p.x, p.y, size), line.p1, line.p2, hit)) {
+		//	createParticle(vertices, p.x, p.y, size, color);
+		//}
 	}
 	if (!tree.subdivided()) return;
 	getSelectedParticles(*tree.getNW(), line, vertices, size, color);
 	getSelectedParticles(*tree.getNE(), line, vertices, size, color);
 	getSelectedParticles(*tree.getSW(), line, vertices, size, color);
 	getSelectedParticles(*tree.getSE(), line, vertices, size, color);
+}
+
+void getSelectedParticles(const QuadTree& tree, const Point& p, vector<Vertex>& vertices, float size, Color color) {
+	const Boundary* bound = tree.getBound();
+	if (!bound->contains(p)) return;
+	const vector<Point>* points = tree.getPoints();
+	for (const Point& p : *points) {
+		createParticle(vertices, p.x, p.y, size, color);
+	}
+	if (!tree.subdivided()) return;
+	getSelectedParticles(*tree.getNW(), p, vertices, size, color);
+	getSelectedParticles(*tree.getNE(), p, vertices, size, color);
+	getSelectedParticles(*tree.getSW(), p, vertices, size, color);
+	getSelectedParticles(*tree.getSE(), p, vertices, size, color);
 }
