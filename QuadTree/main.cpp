@@ -6,7 +6,6 @@ float height = 500;
 float mouseX = 0;
 float mouseY = 0;
 bool renderBoxes = false;
-const uint nParticles = 25000;
 float particleSize = 1;
 vector<Vertex> particlePosition;
 QuadTree tree(Boundary(Point(5, 5), Point(width - 5, height - 10)), 3);
