@@ -8,7 +8,7 @@ float mouseY = 0;
 bool renderBoxes = false;
 float particleSize = 1;
 vector<Vertex> particlePosition;
-QuadTree tree(Boundary(Point(5, 5), Point(width - 5, height - 10)), 8);
+QuadTree tree(Boundary(Point(5, 5), Point(width - 5, height - 10)),1);
 Vector2f lineStart(width / 2, height);
 Vector2f lineEnd(width / 2, height);
 Line line(lineStart, lineEnd);
@@ -39,7 +39,7 @@ int main() {
 		//draw all selected particles
 		vector<Vertex> particleVertex;
 		searchTriangles(tree,line, particleVertex, Color::Green);
-		printf("Selected: %d, Total: %d\n", particleVertex.size() / 3,particlePosition.size()/3);
+		//printf("Selected: %d, Total: %d\n", particleVertex.size() / 3,particlePosition.size()/3);
 		if (particleVertex.size() != 0)
 			window.draw(&particleVertex[0], particleVertex.size(), Triangles);
 
@@ -111,8 +111,8 @@ void fill() {
 	//	tree.insert(t);
 	//}
 	int increment = 8;
-	for (int i = 5; i < height-10; i+= increment) {
-		for (int j = 5; j < width-20; j+= increment) {
+	for (int i = 5; i < width -10; i+= increment) {
+		for (int j = 5; j < height-20; j+= increment) {
 			Vector2f p1, p2, p3;
 			p1 = Vector2f(i + increment / 2, j + 2);
 			p2 = Vector2f(i + 2, j + increment - 2);

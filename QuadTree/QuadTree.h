@@ -52,24 +52,12 @@ public:
 	bool insert(const Triangle& triangle, uint depth = 0) {
 		if (!triangle.isInside(bound) || depth >= 10) return false;
 		if (!divided) subdivide();
-
-		//if inserted then dont need to check other ones
-		bool inserted = false;
-		inserted = NW->insert(triangle, depth + 1);
-		if (inserted) goto HERE;
-		inserted = NE->insert(triangle, depth + 1);
-		if (inserted) goto HERE;
-		inserted = SW->insert(triangle, depth + 1);
-		if (inserted) goto HERE;
-		inserted = SE->insert(triangle, depth + 1);
-
-		HERE:
-		if (!inserted) {
-			//push to the root
+		//insert into root if no nodes can support it
+		if (!(NW->insert(triangle, depth + 1) || NE->insert(triangle, depth + 1) ||
+			SW->insert(triangle, depth + 1) || SE->insert(triangle, depth + 1))) {
 			triangles.push_back(triangle);
-			return !inserted;
 		}
-		return inserted;
+		return true;
 	}
 
 	void searchArea(const Boundary& boundary, list<Point>& searchPoints) {
