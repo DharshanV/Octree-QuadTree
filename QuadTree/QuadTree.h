@@ -3,54 +3,11 @@
 #include <SFML/Graphics.hpp>
 #include <list>
 #include "Point.h"
+#include "Triangle.h"
+#include "Boundary.h"
 typedef unsigned int uint;
 using namespace std;
 using namespace sf;
-
-struct Boundary {
-public:
-	Boundary() :topLeft(0,0),bottomRight(0,0) { }
-	Boundary(const Point& topLeft, const Point& bottomRight) : 
-		topLeft(topLeft),bottomRight(bottomRight) {
-
-	}
-
-	bool contains(const Point& point) const {
-		if ((point.x >= topLeft.x && point.x <= bottomRight.x) &&
-			(point.y >= topLeft.y && point.y <= bottomRight.y)) {
-			return true;
-		}
-		return false;
-	}
-
-	bool intersects(const Boundary& boundary) {
-		return (topLeft.x < boundary.bottomRight.x) &&
-			(bottomRight.x > boundary.topLeft.x) &&
-			(topLeft.y < boundary.bottomRight.y) &&
-			(bottomRight.y > boundary.topLeft.y);
-	}
-
-	float getWidth() {
-		return fabs(topLeft.x - bottomRight.x);
-	}
-
-	float getHeight() {
-		return fabs(topLeft.y - bottomRight.y);
-	}
-
-	void draw(sf::RenderWindow& window) {
-		float sizeX = fabs(topLeft.x - bottomRight.x);
-		float sizeY = fabs(topLeft.y - bottomRight.y);
-		sf::RectangleShape box(sf::Vector2f(sizeX, sizeY));
-		box.setPosition(topLeft.x, topLeft.y);
-		box.setFillColor(sf::Color::Transparent);
-		box.setOutlineThickness(2);
-		window.draw(box);
-	}
-
-	Point topLeft;
-	Point bottomRight;
-};
 
 class QuadTree {
 public:
@@ -72,7 +29,7 @@ public:
 		SE = NULL;
 	}
 
-	void insert(const Point& point) {
+	void insert(const Point& point,uint depth = 0) {
 		//if it doesn't contain then the point is out of bounds
 		if (!bound.contains(point)) return;
 		//if there is size then add it
@@ -81,11 +38,38 @@ public:
 			return;
 		}
 		//at this point we need to sub divide
-		if(!divided) subdivide(point);
-		NW->insert(point);
-		NE->insert(point);
-		SW->insert(point);
-		SE->insert(point);
+		if(!divided) subdivide();
+		NW->insert(point, depth + 1);
+		NE->insert(point, depth + 1);
+		SW->insert(point, depth + 1);
+		SE->insert(point, depth + 1);
+	}
+
+	//First check if triangle is inside the node box. If it does,
+	//then subdivide until to insert triangle into the lowest node.
+	//If it doesn't insert into its child, then insert into the root's
+	//data.
+	bool insert(const Triangle& triangle, uint depth = 0) {
+		if (!triangle.isInside(bound) || depth >= 10) return false;
+		if (!divided) subdivide();
+
+		//if inserted then dont need to check other ones
+		bool inserted = false;
+		inserted = NW->insert(triangle, depth + 1);
+		if (inserted) goto HERE;
+		inserted = NE->insert(triangle, depth + 1);
+		if (inserted) goto HERE;
+		inserted = SW->insert(triangle, depth + 1);
+		if (inserted) goto HERE;
+		inserted = SE->insert(triangle, depth + 1);
+
+		HERE:
+		if (!inserted) {
+			//push to the root
+			triangles.push_back(triangle);
+			return !inserted;
+		}
+		return inserted;
 	}
 
 	void searchArea(const Boundary& boundary, list<Point>& searchPoints) {
@@ -126,29 +110,7 @@ public:
 		SE->getBoxs(quadTree, color);
 	}
 
-	void drawBox(sf::RenderWindow& window) {
-		window.draw(getBox());
-		if (!divided) return;
-		NW->drawBox(window);
-		NE->drawBox(window);
-		SW->drawBox(window);
-		SE->drawBox(window);
-	}
-
-	sf::RectangleShape getBox() {
-		sf::RectangleShape box;
-		float w, h;
-		w = fabs(bound.topLeft.x - bound.bottomRight.x);
-		h = fabs(bound.topLeft.y - bound.bottomRight.y);
-		box.setSize(sf::Vector2f(w, h));
-		box.setPosition(sf::Vector2f(bound.topLeft.x, bound.topLeft.y));
-		box.setOutlineColor(sf::Color(sf::Color::White));
-		box.setFillColor(sf::Color::Transparent);
-		box.setOutlineThickness(boxOutlineSize);
-		return box;
-	}
-
-	void subdivide(const Point& point) {
+	void subdivide() {
 		Boundary NWB, NEB, SWB, SEB;
 
 		float dw = fabs(bound.topLeft.x - bound.bottomRight.x) / 2;
@@ -174,6 +136,10 @@ public:
 		return &points;
 	}
 
+	const vector<Triangle>* getTriangles() const {
+		return &triangles;
+	}
+
 	bool subdivided() const{
 		return divided;
 	}
@@ -192,6 +158,7 @@ public:
 	}
 private:
 	vector<Point> points;
+	vector<Triangle> triangles;
 	Boundary bound;
 	uint maxCount;
 	QuadTree* NW;

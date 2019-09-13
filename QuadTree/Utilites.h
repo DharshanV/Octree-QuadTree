@@ -4,6 +4,7 @@
 #include "Point.h"
 #include "QuadTree.h"
 #include "Line.h"
+#include "Triangle.h"
 using namespace sf;
 Vector2f normalize(const Vector2f& v) {
 	float l = sqrtf(v.x*v.x + v.y*v.y);
@@ -101,4 +102,24 @@ void getSelectedParticles(const QuadTree& tree, const Point& p, vector<Vertex>& 
 	getSelectedParticles(*tree.getNE(), p, vertices, size, color);
 	getSelectedParticles(*tree.getSW(), p, vertices, size, color);
 	getSelectedParticles(*tree.getSE(), p, vertices, size, color);
+}
+
+void searchTriangles(const QuadTree& tree, const Line& line, vector<Vertex>& vertices, Color color) {
+	Vector2f hit;
+	const Boundary* treeBounds = tree.getBound();
+	//if ray doesn't intersect the box, then exit.
+	if (!intersect(treeBounds->topLeft, treeBounds->bottomRight, line.p1, line.p2, hit)) return;
+
+	//Get all the triangles from this node and childern.
+	const vector<Triangle>* triangles = tree.getTriangles();
+	for (const Triangle& t : *triangles) {
+		vertices.push_back(Vertex(Vector2f(t.getP1()->x, t.getP1()->y), color));
+		vertices.push_back(Vertex(Vector2f(t.getP2()->x, t.getP2()->y), color));
+		vertices.push_back(Vertex(Vector2f(t.getP3()->x, t.getP3()->y), color));
+	}
+	if (!tree.subdivided()) return;
+	searchTriangles(*tree.getNW(), line, vertices, color);
+	searchTriangles(*tree.getNE(), line, vertices, color);
+	searchTriangles(*tree.getSW(), line, vertices, color);
+	searchTriangles(*tree.getSE(), line, vertices, color);
 }
