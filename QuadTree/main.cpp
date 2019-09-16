@@ -5,7 +5,7 @@
 #include <Utitlites/VertexBuffer.h>
 #include <Utitlites/VertexBufferLayout.h>
 #include <Utitlites/Shader.h>
-
+#include "Boundary.h"
 void processInput(GLFWwindow *window);
 void resizeCallBack(GLFWwindow* window, int width, int height);
 void mouseCallBack(GLFWwindow* window, double xpos, double ypos);
@@ -30,56 +30,8 @@ int main() {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
 	Shader boxShader("boxShader.vert", "boxShader.frag");
-
-	float vertices[] = {
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f, -0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-
-		-0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f, -0.5f,
-		 0.5f, -0.5f,  0.5f,
-		 0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f,  0.5f,
-		-0.5f, -0.5f, -0.5f,
-
-		-0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f, -0.5f,
-		 0.5f,  0.5f,  0.5f,
-		 0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f,  0.5f,
-		-0.5f,  0.5f, -0.5f
-	};
-
-	VertexArray vao;
-	VertexBuffer vbo(vertices, sizeof(vertices));
-	VertexBufferLayout layout;
-	layout.push<float>(3);
-	vao.addBuffer(vbo, layout);
+	Boundary box({ -0.5f,0.5f,0.5f }, { 0.5f,-0.5f,-0.5f });
+	Boundary box2({ 2.3f,1.3f,0.5f }, { 3.2f,-2.0f,-2.6f });
 
 	while (!window.close()) {
 		float currentFrame = glfwGetTime();
@@ -100,8 +52,8 @@ int main() {
 		boxShader.setMat4f("view", &view[0][0]);
 		boxShader.setMat4f("projection", &projection[0][0]);
 
-		vao.bind();
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		box.draw();
+		box2.draw();
 
 		window.swapBuffers();
 		window.getEvents();

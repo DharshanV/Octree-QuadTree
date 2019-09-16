@@ -152,6 +152,7 @@
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Utilites.h" />
+    <ClInclude Include="Vector3.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="boxShader.frag" />
