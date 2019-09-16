@@ -69,7 +69,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Users\ddvyu\OneDrive\Desktop\Projects\Include;C:\Users\ddvyu\OneDrive\Desktop\Projects\GLM;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\ddvyu\OneDrive\Desktop\Projects\Libraries;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -80,7 +83,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Users\ddvyu\OneDrive\Desktop\Projects\SFML-2.5.1\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-graphics-d.lib;sfml-window-d.lib;sfml-system-d.lib;opengl32.lib;glu32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -124,15 +127,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Include\Utitlites\ElementBuffer.cpp" />
+    <ClCompile Include="..\..\Include\Utitlites\glad.c" />
+    <ClCompile Include="..\..\Include\Utitlites\GLFW.cpp" />
+    <ClCompile Include="..\..\Include\Utitlites\Shader.cpp" />
+    <ClCompile Include="..\..\Include\Utitlites\Texture.cpp" />
+    <ClCompile Include="..\..\Include\Utitlites\VertexArray.cpp" />
+    <ClCompile Include="..\..\Include\Utitlites\VertexBuffer.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\Include\Utitlites\Camera.h" />
+    <ClInclude Include="..\..\Include\Utitlites\ElementBuffer.h" />
+    <ClInclude Include="..\..\Include\Utitlites\GLFW.h" />
+    <ClInclude Include="..\..\Include\Utitlites\Shader.h" />
+    <ClInclude Include="..\..\Include\Utitlites\stb_image.h" />
+    <ClInclude Include="..\..\Include\Utitlites\Texture.h" />
+    <ClInclude Include="..\..\Include\Utitlites\VertexArray.h" />
+    <ClInclude Include="..\..\Include\Utitlites\VertexBuffer.h" />
+    <ClInclude Include="..\..\Include\Utitlites\VertexBufferLayout.h" />
     <ClInclude Include="Boundary.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="Point.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Utilites.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="boxShader.frag" />
+    <None Include="boxShader.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
