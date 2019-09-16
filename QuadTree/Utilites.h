@@ -108,7 +108,7 @@ void searchTriangles(const QuadTree& tree, const Line& line, vector<Vertex>& ver
 	Vector2f hit;
 	const Boundary* treeBounds = tree.getBound();
 	//if ray doesn't intersect the box, then exit.
-	if (!intersect(treeBounds->topLeft, treeBounds->bottomRight, line.p1, line.p2, hit)) return;
+	if (!intersect(treeBounds->topLeft, treeBounds->bottomRight, line.p2, line.p1, hit)) return;
 
 	//Get all the triangles from this node and childern.
 	const vector<Triangle>* triangles = tree.getTriangles();

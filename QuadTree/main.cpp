@@ -1,63 +1,36 @@
-#include "Utilites.h"
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
+#include <iostream>
 using namespace std;
+using namespace sf;
 
 float width = 500;
 float height = 500;
 float mouseX = 0;
 float mouseY = 0;
-bool renderBoxes = false;
-float particleSize = 1;
-vector<Vertex> particlePosition;
-QuadTree tree(Boundary(Point(5, 5), Point(width - 5, height - 10)),1);
-Vector2f lineStart(width / 2, height);
-Vector2f lineEnd(width / 2, height);
-Line line(lineStart, lineEnd);
-int createdTriangle = 0;
 
-void processEvents(RenderWindow& window);
-void fill();
+void processEvents(Window& window);
 
 int main() {
-	srand(time(0));
-	sf::RenderWindow window(sf::VideoMode(width, height), "QuadTree", Style::Default,ContextSettings(0,0,5));
+	ContextSettings settings;
+	settings.antialiasingLevel = 5;
+	sf::Window window(sf::VideoMode(width, height), "Qctree", Style::Default, settings);
+	window.setActive(true);
 	window.setFramerateLimit(60);
 
-	fill();
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
 	while (window.isOpen()) {
 		processEvents(window);
 
-		lineEnd = Vector2f(mouseX, mouseY);
-		line.setEnd(lineEnd);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		window.clear();
-
-		//draw all particles
-		if (particlePosition.size() != 0)
-			window.draw(&particlePosition[0], particlePosition.size(), Triangles);
-
-		//draw all selected particles
-		vector<Vertex> particleVertex;
-		searchTriangles(tree,line, particleVertex, Color::Green);
-		//printf("Selected: %d, Total: %d\n", particleVertex.size() / 3,particlePosition.size()/3);
-		if (particleVertex.size() != 0)
-			window.draw(&particleVertex[0], particleVertex.size(), Triangles);
-
-		//draw quadtree
-		vector<Vertex> boxVertex;
-		if (renderBoxes) {
-			tree.getBoxs(boxVertex, Color(255, 255, 255));
-			if (boxVertex.size() != 0)
-				window.draw(&boxVertex[0], boxVertex.size(), Lines);
-		}
-
-		line.draw(window);
 		window.display();
 	}
 	return 0;
 }
 
-void processEvents(RenderWindow& window) {
+void processEvents(Window& window) {
 	sf::Event event;
 	window.pollEvent(event);
 	if (event.type == Event::Closed) {
@@ -67,61 +40,8 @@ void processEvents(RenderWindow& window) {
 		if (event.key.code == sf::Keyboard::Escape) {
 			window.close();
 		}
-		if (event.key.code == sf::Keyboard::Num9) {
-			renderBoxes = true;
-		}
-		if (event.key.code == sf::Keyboard::Num0) {
-			renderBoxes = false;
-		}
-		if (event.key.code == sf::Keyboard::Num1) {
-		}
 	}
-	if (event.type == Event::MouseMoved) {
-		mouseX = event.mouseMove.x;
-		mouseY = event.mouseMove.y;
-	}
-	if (event.type == Event::MouseButtonReleased) {
-		if (event.mouseButton.button == sf::Mouse::Left) {
-			float x = event.mouseButton.x;
-			float y = event.mouseButton.y;
-			//particlePosition.push_back(Vertex(Vector2f(x,y), Color::Red));
-			//createdTriangle++;
-			//if (createdTriangle == 3) {
-			//	for (int i = particlePosition.size() - 3; i < particlePosition.size(); i += 3) {
-			//		Vector2f p1 = particlePosition[i + 0].position;
-			//		Vector2f p2 = particlePosition[i + 1].position;
-			//		Vector2f p3 = particlePosition[i + 2].position;
-			//		tree.insert(Triangle(p1, p2, p3));
-			//	}
-			//	createdTriangle = 0;
-			//}
-		}
-	}
-}
-
-void fill() {
-	//Vector2f point[] = { {9.000000,15.000000},{32.000000,14.000000},{21.000000,28.000000}, 
-	//			{42.000000,16.000000}, {23.000000,38.000000}, {41.000000,35.000000}, {50.000000,14.000000}, {69.000000,14.000000}, {55.000000,28.000000}, {23.000000,51.000000}, {26.000000,75.000000}, {46.000000,54.000000}, {11.000000,63.000000}, {12.000000,98.000000}, {27.000000,90.000000}, {55.000000,45.000000}, {72.000000,34.000000}, {64.000000,80.000000}, {50.000000,77.000000}, {38.000000,94.000000}, {60.000000,93.000000}, {17.000000,111.000000}, {34.000000,111.000000}, {13.000000,138.000000}, {52.000000,106.000000}, {95.000000,77.000000}, {85.000000,119.000000}, {92.000000,17.000000}, {84.000000,55.000000}, {108.000000,59.000000}, {115.000000,19.000000}, {155.000000,15.000000}, {137.000000,47.000000}, {110.000000,34.000000}, {122.000000,32.000000}, {116.000000,43.000000}, {106.000000,78.000000}, {116.000000,57.000000}, {115.000000,84.000000}, {105.000000,99.000000}, {127.000000,86.000000}, {118.000000,116.000000}, {105.000000,115.000000}, {111.000000,121.000000}, {100.000000,126.000000}, {182.000000,17.000000}, {170.000000,41.000000}, {220.000000,20.000000}, {162.000000,50.000000}, {136.000000,74.000000}, {177.000000,63.000000}, {156.000000,25.000000}, {168.000000,23.000000}, {156.000000,37.000000}, {168.000000,11.000000}, {175.000000,10.000000}, {173.000000,17.000000}, {235.000000,14.000000}, {250.000000,9.000000}, {224.000000,51.000000}, {265.000000,18.000000}, {261.000000,48.000000}, {292.000000,21.000000}, {152.000000,84.000000}, {206.000000,48.000000}, {180.000000,80.000000}, {159.000000,117.000000}, {199.000000,119.000000}, {199.000000,162.000000}, {41.000000,183.000000}, {66.000000,156.000000}, {91.000000,174.000000}, {30.000000,140.000000}, {48.000000,119.000000}, {43.000000,106.000000}, {55.000000,120.000000}, {73.000000,122.000000}, {47.000000,141.000000}, {18.000000,163.000000}, {22.000000,207.000000}, {44.000000,209.000000}, {28.000000,155.000000}, {49.000000,151.000000}, {40.000000,160.000000}, {110.000000,141.000000}, {145.000000,140.000000}, {119.000000,172.000000}, {138.000000,105.000000}, {153.000000,103.000000}, {142.000000,114.000000}, {151.000000,109.000000}, {165.000000,103.000000}, {151.000000,120.000000}, {212.000000,79.000000}, {234.000000,60.000000}, {228.000000,99.000000}, {317.000000,14.000000}, {381.000000,17.000000}, {303.000000,47.000000}, {23.000000,238.000000}, {55.000000,225.000000}, {31.000000,265.000000}, {37.000000,318.000000}, {81.000000,203.000000}, {72.000000,283.000000}, {88.000000,143.000000}, {100.000000,143.000000}, {107.000000,184.000000}, {94.000000,205.000000}, {133.000000,205.000000}, {116.000000,272.000000}, {341.000000,53.000000}, {362.000000,51.000000}, {337.000000,74.000000}, {287.000000,74.000000}, {285.000000,58.000000}, {260.000000,77.000000}, {225.000000,109.000000}, {252.000000,101.000000}, {237.000000,128.000000}, {220.000000,144.000000}, {212.000000,123.000000}, {239.000000,138.000000}, {161.000000,203.000000}, {242.000000,198.000000}, {176.000000,224.000000}, {403.000000,22.000000}, {442.000000,29.000000}, {412.000000,66.000000}, {358.000000,87.000000}, {422.000000,79.000000}, {393.000000,161.000000}, {346.000000,119.000000}, {295.000000,104.000000}, {313.000000,183.000000}, {261.000000,109.000000}, {273.000000,89.000000}, {283.000000,113.000000}, {352.000000,182.000000}, {456.000000,180.000000}, {452.000000,457.000000}, {311.000000,202.000000}, {275.000000,203.000000}, {277.000000,247.000000}, {366.000000,272.000000}, {339.000000,261.000000}, {339.000000,296.000000}, {236.000000,229.000000}, {268.000000,183.000000}, {256.000000,222.000000}, {236.000000,157.000000}, {279.000000,157.000000}, {245.000000,172.000000}, {262.000000,137.000000}, {282.000000,137.000000}, {272.000000,150.000000}, {150.000000,173.000000}, {154.000000,147.000000}, {165.000000,168.000000}, {166.000000,177.000000}, {183.000000,169.000000}, {183.000000,180.000000}, {24.000000,341.000000}, {47.000000,337.000000}, {33.000000,365.000000}, {13.000000,419.000000}, {21.000000,393.000000}, {44.000000,390.000000}, {38.000000,425.000000}, {54.000000,413.000000}, {52.000000,452.000000}, {55.000000,319.000000}, {106.000000,305.000000}, {90.000000,332.000000}, {85.000000,261.000000}, {105.000000,261.000000}, {92.000000,281.000000}, {281.000000,262.000000}, {300.000000,263.000000}, {293.000000,279.000000}, {350.000000,323.000000}, {352.000000,352.000000}, {378.000000,344.000000}, {386.000000,382.000000}, {404.000000,377.000000}, {404.000000,399.000000}, {471.000000,343.000000}, {486.000000,340.000000}, {480.000000,357.000000}, {423.000000,67.000000}, {462.000000,35.000000}, {453.000000,106.000000}, {451.000000,19.000000}, {474.000000,19.000000}, {473.000000,56.000000}, {58.000000,385.000000}, {77.000000,359.000000}, {51.000000,354.000000}, {54.000000,344.000000}, {77.000000,344.000000}, {101.000000,355.000000}, {48.000000,409.000000}, {83.000000,396.000000}, {81.000000,429.000000}, {17.000000,481.000000}, {13.000000,458.000000}, {37.000000,471.000000}};
-	//for (int i = 0; i < 208; i+=3) {
-	//	Triangle t(point[i], point[i + 1], point[i + 2]);
-	//	vector<Vertex> vertices = t.getVertices();
-	//	for (Vertex& v : vertices) {
-	//		particlePosition.push_back(v);
-	//	}
-	//	tree.insert(t);
-	//}
-	int increment = 8;
-	for (int i = 5; i < width -10; i+= increment) {
-		for (int j = 5; j < height-20; j+= increment) {
-			Vector2f p1, p2, p3;
-			p1 = Vector2f(i + increment / 2, j + 2);
-			p2 = Vector2f(i + 2, j + increment - 2);
-			p3 = Vector2f(i + increment - 2, j + increment - 2);
-			Triangle t(p1,p2,p3);
-			particlePosition.push_back(Vertex(p1,Color::Red));
-			particlePosition.push_back(Vertex(p2, Color::Red));
-			particlePosition.push_back(Vertex(p3, Color::Red));
-			tree.insert(t);
-		}
+	if (event.type == Event::Resized) {
+		glViewport(0, 0, event.size.width, event.size.height);
 	}
 }
