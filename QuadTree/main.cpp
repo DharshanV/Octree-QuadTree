@@ -50,7 +50,7 @@ int main() {
 	int count = 50000;
 	Boundary treeBound(vec3(-treeSize, treeSize, treeSize),vec3(treeSize,-treeSize,-treeSize));
 	Boundary searchBound(vec3(-searchSize, searchSize, searchSize), vec3(searchSize, -searchSize, -searchSize));
-	QuadTree tree(treeBound, 30);
+	QuadTree tree(treeBound, 65);
 #pragma omp parallel
 #pragma omp for
 	for (int i = 0; i < count; i++) {
