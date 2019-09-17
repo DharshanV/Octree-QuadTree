@@ -89,9 +89,6 @@
     <ClInclude Include="Vector3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Quad.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="boxShader.vert">
@@ -110,6 +107,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="selectedShader.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="searchBoxShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="searchBoxShader.frag">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

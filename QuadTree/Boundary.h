@@ -3,12 +3,13 @@
 #include <Utitlites/VertexArray.h>
 #include <Utitlites/VertexBuffer.h>
 #include <Utitlites/VertexBufferLayout.h>
-#include "Vector3.h"
+
 using namespace std;
+using namespace glm;
 class Boundary {
 public:
 	Boundary() :topLeft(0, 0, 0), bottomRight(0, 0, 0) { init(); }
-	Boundary(const Vector3& topLeft, const Vector3& bottomRight) :
+	Boundary(const vec3& topLeft, const vec3& bottomRight) :
 		topLeft(topLeft), bottomRight(bottomRight) {
 		init();
 	}
@@ -29,7 +30,7 @@ public:
 		return *this;
 	}
 
-	bool contains(const Vector3& point) const {
+	bool contains(const vec3& point) const {
 		if ((point.x >= topLeft.x && point.x <= bottomRight.x)&& 
 			(point.y >= bottomRight.y && point.y <= topLeft.y) && 
 			(point.z >= bottomRight.z && point.z <= topLeft.z)) {
@@ -38,17 +39,12 @@ public:
 		return false;
 	}
 
-	bool intersects(const Boundary& boundary) {
-		if (fabs(topLeft.x - boundary.topLeft.x) <= getLength() + boundary.getLength()) {
-			//check the Y axis
-			if (fabs(topLeft.y - boundary.topLeft.y) <= getHeight() + boundary.getHeight()) {
-				//check the Z axis
-				if (fabs(topLeft.z - boundary.topLeft.z) <= getWidth() + boundary.getWidth()) {
-					return true;
-				}
-			}
-		}
-		return false;
+	bool intersects(const Boundary& other) {
+		vec3 thisCenter(topLeft.x + getLength() / 2, topLeft.y - getHeight() / 2, topLeft.z - getWidth() / 2);
+		vec3 otherCenter(other.topLeft.x + other.getLength() / 2, other.topLeft.y - other.getHeight() / 2, other.topLeft.z - other.getWidth() / 2);
+		return (abs(thisCenter.x - otherCenter.x) * 2 < (getLength() + other.getLength())) &&
+			(abs(thisCenter.y - otherCenter.y) * 2 < (getHeight() + other.getHeight())) && 
+			(abs(thisCenter.z - otherCenter.z) * 2 < (getWidth() + other.getWidth()));
 	}
 
 	float getLength() const {
@@ -69,11 +65,11 @@ public:
 		glDrawArrays(GL_LINE_STRIP, 0, vertices.size()/3);
 	}
 
-	Vector3 getTopLeft() {
+	vec3 getTopLeft() {
 		return topLeft;
 	}
 
-	Vector3 getBottomRight() {
+	vec3 getBottomRight() {
 		return bottomRight;
 	}
 
@@ -152,8 +148,8 @@ private:
 		vertices.push_back(bottomRight.z+getWidth());
 	}
 private:
-	Vector3 topLeft;
-	Vector3 bottomRight;
+	vec3 topLeft;
+	vec3 bottomRight;
 
 	vector<float> vertices;
 	VertexArray* vao;

@@ -8,12 +8,10 @@
 #include <Utitlites/Shader.h>
 #include "QuadTree.h"
 #include "Point.h"
-#include "Quad.h"
-
+using namespace glm;
 void processInput(GLFWwindow *window);
 void resizeCallBack(GLFWwindow* window, int width, int height);
 void mouseCallBack(GLFWwindow* window, double xpos, double ypos);
-int temp1 = 0;
 float random(float min, float max) {
 	float temp = static_cast <float> (rand());
 	return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
@@ -40,38 +38,43 @@ int main() {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 
+	Shader treeBoxShader("boxShader.vert", "boxShader.frag");
+	Shader searchBoxShader("searchBoxShader.vert", "searchBoxShader.frag");
 	Shader pointsShader("pointsShader.vert", "pointsShader.frag");
 	Shader selectedShader("selectedShader.vert", "selectedShader.frag");
 
-	Vector3 points[] = { 
-		{0,0.1,0.0},
-		{0.5,0.1,0.0},
-	};
+	vector<vec3> points;
+	vector<vec3> selectedPoints;
+	float treeSize = 8.0f;
+	float searchSize = 2.5f;
+	int count = 50000;
+	Boundary treeBound(vec3(-treeSize, treeSize, treeSize),vec3(treeSize,-treeSize,-treeSize));
+	Boundary searchBound(vec3(-searchSize, searchSize, searchSize), vec3(searchSize, -searchSize, -searchSize));
+	QuadTree tree(treeBound, 30);
+#pragma omp parallel
+#pragma omp for
+	for (int i = 0; i < count; i++) {
+		float x = random(-treeSize, treeSize);
+		float y = random(-treeSize, treeSize);
+		float z = random(-treeSize, treeSize);
+		tree.insert(vec3(x,y,z));
+		points.push_back(vec3(x, y, z));
+	}
 
-	Vector3 searchPoints[] = { 
-		{0,0.1,0.0},
-		{0.5,0.1,0.0},
-	};
+	tree.searchArea(searchBound, selectedPoints);
 
-	unsigned int VBO1, VAO1;
-	glGenVertexArrays(1, &VAO1);
-	glGenBuffers(1, &VBO1);
-	glBindVertexArray(VAO1);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO1);
-	glBufferData(GL_ARRAY_BUFFER, 2 * 3 * 4, &points[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * 4, (void*)0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	VertexArray VAO1;
+	VertexBuffer VBO1(&points[0].x, points.size() * 12);
+	VertexBufferLayout layout1;
+	layout1.push<float>(3);
+	VAO1.addBuffer(VBO1, layout1);
 
-	unsigned int VBO2, VAO2;
-	glGenVertexArrays(1, &VAO2);
-	glGenBuffers(1, &VBO2);
-	glBindVertexArray(VAO2);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO2);
-	glBufferData(GL_ARRAY_BUFFER, 2 * 3 * 4, &searchPoints[0].x, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * 4, (void*)0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	VertexArray VAO2;
+	float* ptr = (selectedPoints.size() == 0) ? NULL : &selectedPoints[0].x;
+	VertexBuffer VBO2(ptr, selectedPoints.size() * 12);
+	VertexBufferLayout layout2;
+	layout2.push<float>(3);
+	VAO2.addBuffer(VBO2, layout2);
 
 	while (!window.close()) {
 		float currentFrame = glfwGetTime();
@@ -82,16 +85,37 @@ int main() {
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//draw
+		mat4 model(1.0f);
+		mat4 view = camera.GetViewMatrix();
+		mat4 projection = glm::perspective(45.0f, (float)screenWidth / screenHeight, 0.1f, 100.0f);
+
+		treeBoxShader.use();
+		treeBoxShader.setMat4f("model", &model[0][0]);
+		treeBoxShader.setMat4f("view", &view[0][0]);
+		treeBoxShader.setMat4f("projection", &projection[0][0]);
+		if (renderbox) tree.draw();
+
+		searchBoxShader.use();
+		searchBoxShader.setMat4f("model", &model[0][0]);
+		searchBoxShader.setMat4f("view", &view[0][0]);
+		searchBoxShader.setMat4f("projection", &projection[0][0]);
+		searchBound.draw();
+
 		pointsShader.use();
-		glBindVertexArray(VAO1);
-		glPointSize(8.0f);
-		glDrawArrays(GL_POINTS, 0, 2);
+		pointsShader.setMat4f("model", &model[0][0]);
+		pointsShader.setMat4f("view", &view[0][0]);
+		pointsShader.setMat4f("projection", &projection[0][0]);
+		VAO1.bind();
+		glPointSize(3.0f);
+		glDrawArrays(GL_POINTS, 0, points.size());
 
 		selectedShader.use();
-		glBindVertexArray(VAO2);
-		glPointSize(10.0f);
-		glDrawArrays(GL_POINTS, 0, 2);
+		selectedShader.setMat4f("model", &model[0][0]);
+		selectedShader.setMat4f("view", &view[0][0]);
+		selectedShader.setMat4f("projection", &projection[0][0]);
+		VAO2.bind();
+		glPointSize(6.0f);
+		glDrawArrays(GL_POINTS, 0, selectedPoints.size());
 
 		window.swapBuffers();
 		window.getEvents();

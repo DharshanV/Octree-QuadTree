@@ -4,7 +4,7 @@
 #include "Boundary.h"
 typedef unsigned int uint;
 using namespace std;
-
+using namespace glm;
 class QuadTree {
 public:
 	QuadTree() {
@@ -17,7 +17,7 @@ public:
 		init();
 	}
 
-	void insert(const Vector3& point,uint depth = 0) {
+	void insert(const vec3& point,uint depth = 0) {
 		//if it doesn't contain then the point is out of bounds
 		if (!bound.contains(point)) return;
 		//if there is size then add it
@@ -52,10 +52,10 @@ public:
 	//	return true;
 	//}
 
-	void searchArea(const Boundary& boundary, vector<Vector3>& searchPoints) {
+	void searchArea(const Boundary& boundary, vector<vec3>& searchPoints) {
 		if (!bound.intersects(boundary)) return;
-		for (Vector3& p : points) {
-			searchPoints.push_back(p);
+		for (vec3& p : points) {
+			if(boundary.contains(p)) searchPoints.push_back(p);
 		}
 		if (!divided) return;
 		NW1->searchArea(boundary, searchPoints);
@@ -89,23 +89,23 @@ public:
 		float dl = bound.getLength() / 2;
 		float dw = bound.getWidth() / 2;
 		float dh = bound.getHeight() / 2;
-		Vector3 topLeft, bottomRight;
+		vec3 topLeft, bottomRight;
 		topLeft = bound.getTopLeft();
 		bottomRight = bound.getBottomRight();
 
-		NWB1 = Boundary(topLeft, Vector3(topLeft.x + dl, topLeft.y - dh, topLeft.z - dw));
-		NEB1 = Boundary(Vector3(topLeft.x+dl,topLeft.y,topLeft.z),Vector3(topLeft.x+dl*2, topLeft.y-dh, topLeft.z-dw));
-		SWB1 = Boundary(Vector3(topLeft.x, topLeft.y-dh, topLeft.z),Vector3(topLeft.x+dl, topLeft.y-dh*2, topLeft.z-dw));
-		SEB1 = Boundary(Vector3(topLeft.x+dl, topLeft.y-dh, topLeft.z), Vector3(topLeft.x + dl *2, topLeft.y - dh * 2, topLeft.z - dw));
+		NWB1 = Boundary(topLeft, vec3(topLeft.x + dl, topLeft.y - dh, topLeft.z - dw));
+		NEB1 = Boundary(vec3(topLeft.x+dl,topLeft.y,topLeft.z),vec3(topLeft.x+dl*2, topLeft.y-dh, topLeft.z-dw));
+		SWB1 = Boundary(vec3(topLeft.x, topLeft.y-dh, topLeft.z),vec3(topLeft.x+dl, topLeft.y-dh*2, topLeft.z-dw));
+		SEB1 = Boundary(vec3(topLeft.x+dl, topLeft.y-dh, topLeft.z), vec3(topLeft.x + dl *2, topLeft.y - dh * 2, topLeft.z - dw));
 		NW1 = new QuadTree(NWB1, maxCount);
 		NE1 = new QuadTree(NEB1, maxCount);
 		SW1 = new QuadTree(SWB1, maxCount);
 		SE1 = new QuadTree(SEB1, maxCount);
 
-		NWB2 = Boundary(Vector3(topLeft.x, topLeft.y, topLeft.z - dw), Vector3(topLeft.x + dl, topLeft.y - dh, topLeft.z - dw *2));
-		NEB2 = Boundary(Vector3(topLeft.x + dl, topLeft.y, topLeft.z - dw), Vector3(topLeft.x + dl * 2, topLeft.y - dh, topLeft.z - dw * 2));
-		SWB2 = Boundary(Vector3(topLeft.x, topLeft.y - dh, topLeft.z - dw), Vector3(topLeft.x + dl, topLeft.y - dh * 2, topLeft.z - dw * 2));
-		SEB2 = Boundary(Vector3(topLeft.x + dl, topLeft.y - dh, topLeft.z - dw), Vector3(topLeft.x + dl * 2, topLeft.y - dh * 2, topLeft.z - dw * 2));
+		NWB2 = Boundary(vec3(topLeft.x, topLeft.y, topLeft.z - dw), vec3(topLeft.x + dl, topLeft.y - dh, topLeft.z - dw *2));
+		NEB2 = Boundary(vec3(topLeft.x + dl, topLeft.y, topLeft.z - dw), vec3(topLeft.x + dl * 2, topLeft.y - dh, topLeft.z - dw * 2));
+		SWB2 = Boundary(vec3(topLeft.x, topLeft.y - dh, topLeft.z - dw), vec3(topLeft.x + dl, topLeft.y - dh * 2, topLeft.z - dw * 2));
+		SEB2 = Boundary(vec3(topLeft.x + dl, topLeft.y - dh, topLeft.z - dw), vec3(topLeft.x + dl * 2, topLeft.y - dh * 2, topLeft.z - dw * 2));
 		NW2 = new QuadTree(NWB2, maxCount);
 		NE2 = new QuadTree(NEB2, maxCount);
 		SW2 = new QuadTree(SWB2, maxCount);
@@ -132,7 +132,7 @@ public:
 		return &bound;
 	}
 
-	const vector<Vector3>* getPoints() const {
+	const vector<vec3>* getPoints() const {
 		return &points;
 	}
 
@@ -179,7 +179,7 @@ private:
 	}
 
 private:
-	vector<Vector3> points;
+	vector<vec3> points;
 	Boundary bound;
 	uint maxCount;
 	QuadTree* NW1;
