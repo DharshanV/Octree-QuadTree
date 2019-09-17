@@ -12,10 +12,8 @@ using namespace glm;
 void processInput(GLFWwindow *window);
 void resizeCallBack(GLFWwindow* window, int width, int height);
 void mouseCallBack(GLFWwindow* window, double xpos, double ypos);
-float random(float min, float max) {
-	float temp = static_cast <float> (rand());
-	return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
-}
+float random(float min, float max);
+
 int screenWidth = 800;
 int screenHeight = 600;
 float lastX = screenWidth / 2.0f;
@@ -43,14 +41,15 @@ int main() {
 	Shader pointsShader("pointsShader.vert", "pointsShader.frag");
 	Shader selectedShader("selectedShader.vert", "selectedShader.frag");
 
+	int count = 50000;
 	vector<vec3> points;
+	points.reserve(count);
 	vector<vec3> selectedPoints;
 	float treeSize = 8.0f;
 	float searchSize = 2.5f;
-	int count = 50000;
 	Boundary treeBound(vec3(-treeSize, treeSize, treeSize),vec3(treeSize,-treeSize,-treeSize));
 	Boundary searchBound(vec3(-searchSize, searchSize, searchSize), vec3(searchSize, -searchSize, -searchSize));
-	QuadTree tree(treeBound, 65);
+	QuadTree tree(treeBound, 500);
 #pragma omp parallel
 #pragma omp for
 	for (int i = 0; i < count; i++) {
@@ -65,16 +64,14 @@ int main() {
 
 	VertexArray VAO1;
 	VertexBuffer VBO1(&points[0].x, points.size() * 12);
-	VertexBufferLayout layout1;
-	layout1.push<float>(3);
-	VAO1.addBuffer(VBO1, layout1);
+	VertexBufferLayout layout;
+	layout.push<float>(3);
+	VAO1.addBuffer(VBO1, layout);
 
 	VertexArray VAO2;
 	float* ptr = (selectedPoints.size() == 0) ? NULL : &selectedPoints[0].x;
 	VertexBuffer VBO2(ptr, selectedPoints.size() * 12);
-	VertexBufferLayout layout2;
-	layout2.push<float>(3);
-	VAO2.addBuffer(VBO2, layout2);
+	VAO2.addBuffer(VBO2, layout);
 
 	while (!window.close()) {
 		float currentFrame = glfwGetTime();
@@ -168,4 +165,9 @@ void mouseCallBack(GLFWwindow* window, double xpos, double ypos) {
 	lastY = ypos;
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
+}
+
+float random(float min, float max) {
+	float temp = static_cast <float> (rand());
+	return min + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (max - min)));
 }
