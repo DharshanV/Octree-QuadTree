@@ -42,6 +42,10 @@ public:
 	}
 
 public:
+	inline bool operator ==(const Vector3& v) {
+		return (x == v.x && y == v.y && z == v.z);
+	}
+
 	inline Vector3& operator = (const Vector3& v) {
 		x = v.x;
 		y = v.y;

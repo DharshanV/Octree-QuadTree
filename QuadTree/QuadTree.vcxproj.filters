@@ -89,12 +89,27 @@
     <ClInclude Include="Vector3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Quad.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="boxShader.vert">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="boxShader.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="pointsShader.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="pointsShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="selectedShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="selectedShader.frag">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

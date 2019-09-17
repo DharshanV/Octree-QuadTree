@@ -13,33 +13,53 @@ public:
 		init();
 	}
 
+	Boundary(const Boundary& other) {
+		topLeft = other.topLeft;
+		bottomRight = other.bottomRight;
+		init();
+	}
+
+	Boundary& operator = (const Boundary& other) {
+		if (this == &other) return *this;
+		delete vao;
+		delete vbo;
+		topLeft = other.topLeft;
+		bottomRight = other.bottomRight;
+		init();
+		return *this;
+	}
+
 	bool contains(const Vector3& point) const {
-		if ((point.x >= topLeft.x && point.x <= bottomRight.x) &&
-			(point.y >= topLeft.y && point.y <= bottomRight.y) && 
-			(point.z >= topLeft.z && point.z <= bottomRight.z)) {
+		if ((point.x >= topLeft.x && point.x <= bottomRight.x)&& 
+			(point.y >= bottomRight.y && point.y <= topLeft.y) && 
+			(point.z >= bottomRight.z && point.z <= topLeft.z)) {
 			return true;
 		}
 		return false;
 	}
 
 	bool intersects(const Boundary& boundary) {
-		return (topLeft.x < boundary.bottomRight.x) &&
-			(bottomRight.x > boundary.topLeft.x) &&
-			(topLeft.y < boundary.bottomRight.y) &&
-			(bottomRight.y > boundary.topLeft.y) &&
-			(topLeft.z < boundary.bottomRight.z) &&
-			(bottomRight.z > boundary.topLeft.z);
+		if (fabs(topLeft.x - boundary.topLeft.x) <= getLength() + boundary.getLength()) {
+			//check the Y axis
+			if (fabs(topLeft.y - boundary.topLeft.y) <= getHeight() + boundary.getHeight()) {
+				//check the Z axis
+				if (fabs(topLeft.z - boundary.topLeft.z) <= getWidth() + boundary.getWidth()) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
-	float getLength() {
+	float getLength() const {
 		return fabs(topLeft.x - bottomRight.x);
 	}
 
-	float getWidth() {
+	float getWidth() const {
 		return fabs(topLeft.z - bottomRight.z);
 	}
 
-	float getHeight() {
+	float getHeight() const {
 		return fabs(topLeft.y - bottomRight.y);
 	}
 
@@ -49,9 +69,17 @@ public:
 		glDrawArrays(GL_LINE_STRIP, 0, vertices.size()/3);
 	}
 
+	Vector3 getTopLeft() {
+		return topLeft;
+	}
+
+	Vector3 getBottomRight() {
+		return bottomRight;
+	}
+
 	~Boundary() {
-		delete vao;
-		delete vbo;
+		if (vao != NULL) {delete vao; vao = NULL;}
+		if (vbo != NULL) { delete vbo; vbo = NULL; }
 	}
 private:
 	void init() {
@@ -123,7 +151,6 @@ private:
 		vertices.push_back(bottomRight.y);
 		vertices.push_back(bottomRight.z+getWidth());
 	}
-
 private:
 	Vector3 topLeft;
 	Vector3 bottomRight;
