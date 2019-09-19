@@ -160,10 +160,13 @@
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Utilites.h" />
     <ClInclude Include="Vector3.h" />
+    <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="boxShader.frag" />
     <None Include="boxShader.vert" />
+    <None Include="lineShader.frag" />
+    <None Include="lineShader.vert" />
     <None Include="pointsShader.frag" />
     <None Include="pointsShader.vert" />
     <None Include="searchBoxShader.frag" />

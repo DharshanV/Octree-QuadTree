@@ -3,7 +3,7 @@
 #include <Utitlites/VertexArray.h>
 #include <Utitlites/VertexBuffer.h>
 #include <Utitlites/VertexBufferLayout.h>
-
+#include "Line.h"
 using namespace std;
 using namespace glm;
 class Boundary {
@@ -45,6 +45,10 @@ public:
 		return (abs(thisCenter.x - otherCenter.x) * 2 < (getLength() + other.getLength())) &&
 			(abs(thisCenter.y - otherCenter.y) * 2 < (getHeight() + other.getHeight())) && 
 			(abs(thisCenter.z - otherCenter.z) * 2 < (getWidth() + other.getWidth()));
+	}
+
+	bool intersects(const Line& line) {
+		return false;
 	}
 
 	float getLength() const {

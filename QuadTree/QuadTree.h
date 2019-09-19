@@ -2,6 +2,7 @@
 #include <iostream>
 #include <list>
 #include "Boundary.h"
+#include "Line.h"
 typedef unsigned int uint;
 using namespace std;
 using namespace glm;
@@ -54,6 +55,18 @@ public:
 		if (!divided) return;
 		for (QuadTree* tree : subtrees) {
 			tree->searchArea(boundary, searchPoints);
+		}
+	}
+
+	void searchArea(const Line& line, vector<vec3>& searchPoints) {
+		if (!bound.intersects(line)) return;
+		for (vec3& p : points) {
+			//if (line.contains(p)) 
+			searchPoints.push_back(p);
+		}
+		if (!divided) return;
+		for (QuadTree* tree : subtrees) {
+			tree->searchArea(line, searchPoints);
 		}
 	}
 
