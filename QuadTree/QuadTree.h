@@ -61,8 +61,7 @@ public:
 	void searchArea(const Line& line, vector<vec3>& searchPoints) {
 		if (!bound.intersects(line)) return;
 		for (vec3& p : points) {
-			//if (line.contains(p)) 
-			searchPoints.push_back(p);
+			if (line.contains(p)) searchPoints.push_back(p);
 		}
 		if (!divided) return;
 		for (QuadTree* tree : subtrees) {

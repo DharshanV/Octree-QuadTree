@@ -155,7 +155,6 @@
     <ClInclude Include="..\..\Include\Utitlites\VertexBufferLayout.h" />
     <ClInclude Include="Boundary.h" />
     <ClInclude Include="Line.h" />
-    <ClInclude Include="Point.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Utilites.h" />

@@ -8,7 +8,6 @@
 #include <iostream>
 #include <ctime>
 #include "QuadTree.h"
-#include "Point.h"
 using namespace glm;
 
 //Variables
@@ -20,8 +19,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool renderbox = false;
-int spawnCount = 1000;
-float treeSize = 15.0f;
+int spawnCount = 100000;
+float treeSize = 25.0f;
 float searchSize = 2.5f;
 float crossHair[] = {
 	0.0f,0.015f,0.0f,
@@ -31,9 +30,8 @@ float crossHair[] = {
 };
 
 GLFW window(screenWidth, screenHeight, "Octree");
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 30.0f));
 Boundary treeBound(vec3(-treeSize, treeSize, treeSize), vec3(treeSize, -treeSize, -treeSize));
-Boundary searchBound(vec3(-searchSize, searchSize, searchSize), vec3(searchSize, -searchSize, -searchSize));
 QuadTree tree(treeBound, 500);
 
 
@@ -46,7 +44,6 @@ vector<Line> lines;
 
 //Shaders
 Shader treeBoxShader("boxShader.vert", "boxShader.frag");
-Shader searchBoxShader("searchBoxShader.vert", "searchBoxShader.frag");
 Shader pointsShader("pointsShader.vert", "pointsShader.frag");
 Shader selectedShader("selectedShader.vert", "selectedShader.frag");
 Shader lineShader("lineShader.vert", "lineShader.frag");
@@ -92,16 +89,16 @@ void resizeCallBack(GLFWwindow* window, int width, int height) {
 
 void mouseCallBack(GLFWwindow* window, double xpos, double ypos) {
 	if (firstMouse) {
-		lastX = xpos;
-		lastY = ypos;
+		lastX = (float)xpos;
+		lastY = (float)ypos;
 		firstMouse = false;
 	}
 
-	float xoffset = xpos - lastX;
-	float yoffset = lastY - ypos;
+	float xoffset = (float)xpos - lastX;
+	float yoffset = lastY - (float)ypos;
 
-	lastX = xpos;
-	lastY = ypos;
+	lastX = (float)xpos;
+	lastY = (float)ypos;
 
 	camera.ProcessMouseMovement(xoffset, yoffset);
 }

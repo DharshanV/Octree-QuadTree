@@ -48,7 +48,40 @@ public:
 	}
 
 	bool intersects(const Line& line) {
-		return false;
+		float tmin = (topLeft.x - line.getOrigin().x) / line.getDir().x;
+		float tmax = (bottomRight.x - line.getOrigin().x) / line.getDir().x;
+
+		if (tmin > tmax) swap(tmin, tmax);
+
+		float tymin = (topLeft.y - line.getOrigin().y) / line.getDir().y;
+		float tymax = (bottomRight.y - line.getOrigin().y) / line.getDir().y;
+
+		if (tymin > tymax) swap(tymin, tymax);
+
+		if ((tmin > tymax) || (tymin > tmax))
+			return false;
+
+		if (tymin > tmin)
+			tmin = tymin;
+
+		if (tymax < tmax)
+			tmax = tymax;
+
+		float tzmin = (topLeft.z - line.getOrigin().z) / line.getDir().z;
+		float tzmax = (bottomRight.z - line.getOrigin().z) / line.getDir().z;
+
+		if (tzmin > tzmax) swap(tzmin, tzmax);
+
+		if ((tmin > tzmax) || (tzmin > tmax))
+			return false;
+
+		if (tzmin > tmin)
+			tmin = tzmin;
+
+		if (tzmax < tmax)
+			tmax = tzmax;
+
+		return true;
 	}
 
 	float getLength() const {

@@ -32,7 +32,23 @@ public:
 	}
 
 	bool contains(const vec3& point) const {
+		vec3 originToPoint = point - origin;
+		float t = dot(originToPoint,dir);
+		if (t < 0)return false;
+		vec3 pointOnLine = origin + dir * t;
+		vec3 closestToPoint = pointOnLine - point;
+		if (length(closestToPoint) <= 1.0f) {
+			return true;
+		}
 		return false;
+	}
+
+	vec3 getOrigin() const {
+		return origin;
+	}
+
+	vec3 getDir() const {
+		return dir;
 	}
 
 	void draw() {
@@ -70,5 +86,4 @@ private:
 vec3 operator * (const vec3& v, float t) {
 	return vec3(v.x*t, v.y*t, v.z*t);
 }
-
 #endif // !LINE_H
