@@ -19,9 +19,8 @@ bool firstMouse = true;
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 bool renderbox = false;
-int spawnCount = 100000;
-float treeSize = 25.0f;
-float searchSize = 2.5f;
+int spawnCount = 5;
+float treeSize = 20.0f;
 float crossHair[] = {
 	0.0f,0.015f,0.0f,
 	0.0f,-0.017f,0.0f,
@@ -30,14 +29,15 @@ float crossHair[] = {
 };
 
 GLFW window(screenWidth, screenHeight, "Octree");
-Camera camera(glm::vec3(0.0f, 0.0f, 30.0f));
+Camera camera(glm::vec3(0.0f, 0.0f, 5.0f));
 Boundary treeBound(vec3(-treeSize, treeSize, treeSize), vec3(treeSize, -treeSize, -treeSize));
-QuadTree tree(treeBound, 500);
+QuadTree tree(treeBound, 10);
 
 
 //vectors
 vector<vec3> points;
 vector<vec3> selectedPoints;
+vector<Triangle> selectedTriangles;
 
 //lists
 vector<Line> lines;
@@ -77,7 +77,7 @@ void processInput(GLFWwindow* glfwwindow) {
 void mouseButtonCallBack(GLFWwindow* window, int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
 		lines.push_back(Line(camera.Position, camera.Front));
-		tree.searchArea(lines[lines.size() - 1], selectedPoints);
+		tree.searchTriangles(lines[lines.size() - 1], selectedPoints);
 	}
 }
 

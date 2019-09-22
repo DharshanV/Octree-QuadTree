@@ -10,24 +10,34 @@ int main() {
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 	glEnable(GL_DEPTH_TEST);
 
-	points.reserve(spawnCount);
+	float width = tree.getBound()->getWidth();
+	float height = tree.getBound()->getHeight();
+	float length = tree.getBound()->getLength();
+	vec3 start = tree.getBound()->getTopLeft();
+	vec3 end = tree.getBound()->getBottomRight();
+	float size = 0.5f;
+	float delta = 1.0f;
 
-#pragma omp parallel
-#pragma omp for
-	for (int i = 0; i < spawnCount; i++) {
-		float x = random(-treeSize, treeSize);
-		float y = random(-treeSize, treeSize);
-		float z = random(-treeSize, treeSize);
-		tree.insert(vec3(x,y,z));
-		points.push_back(vec3(x, y, z));
+	for (float z = start.z; z > end.z; z-= delta) {
+		for (float y = start.y; y > end.y; y-= delta) {
+			for (float x = start.x; x < end.x; x += delta) {
+				vec3 p1, p2, p3;
+				p1 = vec3(x-size, y - size, z);
+				p2 = vec3(x, y+size, z);
+				p3 = vec3(x+size, y-size, z);
+				Triangle t(p1, p2, p3);
+				points.push_back(p1);
+				points.push_back(p2);
+				points.push_back(p3);
+				tree.insert(t);
+			}
+		}
 	}
-
 	VertexArray VAO1;
 	VertexBuffer VBO1(&points[0].x, points.size() * 12);
 	VertexBufferLayout layout;
 	layout.push<float>(3);
 	VAO1.addBuffer(VBO1, layout);
-
 
 	while (!window.close()) {
 		float currentFrame = (float)glfwGetTime();
@@ -53,17 +63,15 @@ int main() {
 		if (renderbox) tree.draw();
 		treeBoxShader.unuse();
 
-		pointsShader.use(model, view, projection);
-		VAO1.bind();
-		glPointSize(3.0f);
-		glDrawArrays(GL_POINTS, 0, points.size());
-		pointsShader.unuse();
-
 		selectedShader.use(model, view, projection);
 		VAO2.bind();
-		glPointSize(6.0f);
-		glDrawArrays(GL_POINTS, 0, selectedPoints.size());
+		glDrawArrays(GL_TRIANGLES, 0, selectedPoints.size());
 		selectedShader.unuse();
+
+		pointsShader.use(model, view, projection);
+		VAO1.bind();
+		glDrawArrays(GL_TRIANGLES, 0, points.size());
+		pointsShader.unuse();
 
 		lineShader.use(model, view, projection);
 		for (Line& l : lines) {

@@ -3,6 +3,7 @@
 #include <list>
 #include "Boundary.h"
 #include "Line.h"
+#include "Triangle.h"
 typedef unsigned int uint;
 using namespace std;
 using namespace glm;
@@ -36,16 +37,22 @@ public:
 	//then subdivide until to insert triangle into the lowest node.
 	//If it doesn't insert into its child, then insert into the root's
 	//data.
-	//bool insert(const Triangle& triangle, uint depth = 0) {
-	//	//if (!triangle.isInside(bound) || depth >= 10) return false;
-	//	//if (!divided) subdivide();
-	//	////insert into root if no nodes can support it
-	//	//if (!(NW->insert(triangle, depth + 1) || NE->insert(triangle, depth + 1) ||
-	//	//	SW->insert(triangle, depth + 1) || SE->insert(triangle, depth + 1))) {
-	//	//	triangles.push_back(triangle);
-	//	//}
-	//	return true;
-	//}
+	bool insert(const Triangle& triangle, uint depth = 0) {
+		if (!bound.contains(triangle) || depth >= 3) return false;
+		//if (triangles.size() >= maxCount)return false;
+		if (!divided) subdivide();
+		if (!(subtrees[0]->insert(triangle, depth + 1) ||
+			  subtrees[1]->insert(triangle, depth + 1) || 
+			  subtrees[2]->insert(triangle, depth + 1) || 
+			  subtrees[3]->insert(triangle, depth + 1) || 
+			  subtrees[4]->insert(triangle, depth + 1) || 
+			  subtrees[5]->insert(triangle, depth + 1) || 
+			  subtrees[6]->insert(triangle, depth + 1) || 
+			  subtrees[7]->insert(triangle, depth + 1))) {
+			triangles.push_back(triangle);
+		}
+		return true;
+	}
 
 	void searchArea(const Boundary& boundary, vector<vec3>& searchPoints) {
 		if (!bound.intersects(boundary)) return;
@@ -66,6 +73,21 @@ public:
 		if (!divided) return;
 		for (QuadTree* tree : subtrees) {
 			tree->searchArea(line, searchPoints);
+		}
+	}
+
+	void searchTriangles(const Line& line, vector<vec3>& searchTriangles) {
+		if (!bound.intersects(line)) return;
+		for (Triangle& t : triangles) {
+			if (line.contains(t)) {
+				searchTriangles.push_back(*t.getP1());
+				searchTriangles.push_back(*t.getP2());
+				searchTriangles.push_back(*t.getP3());
+			}
+		}
+		if (!divided) return;
+		for (QuadTree* tree : subtrees) {
+			tree->searchTriangles(line, searchTriangles);
 		}
 	}
 
@@ -133,6 +155,7 @@ private:
 
 private:
 	list<vec3> points;
+	list<Triangle> triangles;
 	Boundary bound;
 	uint maxCount;
 	QuadTree* subtrees[8];

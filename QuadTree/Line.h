@@ -4,8 +4,10 @@
 #include <Utitlites/VertexArray.h>
 #include <Utitlites/VertexBuffer.h>
 #include <Utitlites/VertexBufferLayout.h>
+#include "Triangle.h"
 using namespace std;
 using namespace glm;
+#define EPSILON 0.00001f
 class Line {
 public:
 	Line(const vec3& origin, const vec3& dir) :
@@ -41,6 +43,22 @@ public:
 			return true;
 		}
 		return false;
+	}
+
+	bool contains(const Triangle& triangle) const {
+		vec3 edge1 = *triangle.getP1() - *triangle.getP2();
+		vec3 edge2 = *triangle.getP3() - *triangle.getP2();
+
+		vec3 pvec = cross(dir, edge2);
+		float det = dot(edge1, pvec);
+		if (det < EPSILON) return false;
+		vec3 tvec = origin - *triangle.getP2();
+		float u = dot(tvec, pvec);
+		if (u < 0 || u > det) return false;
+		vec3 qvec = cross(tvec, edge1);
+		float v = dot(dir, qvec);
+		if (v < 0 || u + v > det) return false;
+		return true;
 	}
 
 	vec3 getOrigin() const {

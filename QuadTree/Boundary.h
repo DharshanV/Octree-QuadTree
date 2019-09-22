@@ -4,6 +4,7 @@
 #include <Utitlites/VertexBuffer.h>
 #include <Utitlites/VertexBufferLayout.h>
 #include "Line.h"
+#include "Triangle.h"
 using namespace std;
 using namespace glm;
 class Boundary {
@@ -34,6 +35,15 @@ public:
 		if ((point.x >= topLeft.x && point.x <= bottomRight.x)&& 
 			(point.y >= bottomRight.y && point.y <= topLeft.y) && 
 			(point.z >= bottomRight.z && point.z <= topLeft.z)) {
+			return true;
+		}
+		return false;
+	}
+
+	bool contains(const Triangle& triangle) const {
+		if (contains(*triangle.getP1()) && 
+			contains(*triangle.getP2()) &&
+			contains(*triangle.getP3())) {
 			return true;
 		}
 		return false;
@@ -102,11 +112,11 @@ public:
 		glDrawArrays(GL_LINE_STRIP, 0, vertices.size()/3);
 	}
 
-	vec3 getTopLeft() {
+	const vec3 getTopLeft() const {
 		return topLeft;
 	}
 
-	vec3 getBottomRight() {
+	const vec3 getBottomRight() const {
 		return bottomRight;
 	}
 
