@@ -89,6 +89,12 @@
     <ClInclude Include="Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="boxShader.vert">
@@ -109,16 +115,16 @@
     <None Include="selectedShader.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="searchBoxShader.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="searchBoxShader.frag">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="lineShader.frag">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="lineShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="modelShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="modelShader.frag">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

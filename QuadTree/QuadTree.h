@@ -4,6 +4,7 @@
 #include "Boundary.h"
 #include "Line.h"
 #include "Triangle.h"
+#include "Model.h"
 typedef unsigned int uint;
 using namespace std;
 using namespace glm;
@@ -38,7 +39,7 @@ public:
 	//If it doesn't insert into its child, then insert into the root's
 	//data.
 	bool insert(const Triangle& triangle, uint depth = 0) {
-		if (!bound.contains(triangle) || depth >= 3) return false;
+		if (!bound.contains(triangle) || depth >= 6) return false;
 		//if (triangles.size() >= maxCount)return false;
 		if (!divided) subdivide();
 		if (!(subtrees[0]->insert(triangle, depth + 1) ||
@@ -50,6 +51,18 @@ public:
 			  subtrees[6]->insert(triangle, depth + 1) || 
 			  subtrees[7]->insert(triangle, depth + 1))) {
 			triangles.push_back(triangle);
+		}
+		return true;
+	}
+
+	bool insert(const Model& model) {
+		vector<const Vertex*> vertices;
+		model.getVertex(vertices);
+		for (int i = 0; i < vertices.size(); i += 3) {
+			const vec3 p1 = vertices[i+0]->Position;
+			const vec3 p2 = vertices[i+1]->Position;
+			const vec3 p3 = vertices[i+2]->Position;
+			insert(Triangle(p2,p1,p3));
 		}
 		return true;
 	}
@@ -80,8 +93,8 @@ public:
 		if (!bound.intersects(line)) return;
 		for (Triangle& t : triangles) {
 			if (line.contains(t)) {
-				searchTriangles.push_back(*t.getP1());
 				searchTriangles.push_back(*t.getP2());
+				searchTriangles.push_back(*t.getP1());
 				searchTriangles.push_back(*t.getP3());
 			}
 		}

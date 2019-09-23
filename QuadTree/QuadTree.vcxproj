@@ -87,7 +87,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;assimp-vc141-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -155,6 +155,8 @@
     <ClInclude Include="..\..\Include\Utitlites\VertexBufferLayout.h" />
     <ClInclude Include="Boundary.h" />
     <ClInclude Include="Line.h" />
+    <ClInclude Include="mesh.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="QuadTree.h" />
     <ClInclude Include="Triangle.h" />
     <ClInclude Include="Utilites.h" />
@@ -166,10 +168,10 @@
     <None Include="boxShader.vert" />
     <None Include="lineShader.frag" />
     <None Include="lineShader.vert" />
+    <None Include="modelShader.frag" />
+    <None Include="modelShader.vert" />
     <None Include="pointsShader.frag" />
     <None Include="pointsShader.vert" />
-    <None Include="searchBoxShader.frag" />
-    <None Include="searchBoxShader.vert" />
     <None Include="selectedShader.frag" />
     <None Include="selectedShader.vert" />
   </ItemGroup>
