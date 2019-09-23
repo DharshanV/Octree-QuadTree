@@ -11,6 +11,6 @@ A spatial data structure to accelerate data look up. Useful for ray tracing wher
 | ------------- | ------------- | ------------- |
 | ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example5.gif)| ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example6.gif)| ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example7.gif) |
 
-| 1 Million Ray-Point Intersection |
-| ------------- |
-| ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example8.gif) |
+| 1 Million Ray-Point Intersection | Model Ray Intersection |
+| ------------- | ------------- |
+| ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example8.gif) | ![Output sample](https://github.com/DharshanV/QuadTree/blob/master/Examples/example9.gif) |
