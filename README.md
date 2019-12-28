@@ -1,4 +1,4 @@
-# QuadTree
+# Octree-QuadTree
 A spatial data structure to accelerate data look up. Useful for ray tracing where quick look up 3d ray-triangle intersection. 
 ### Example runs
 #### 3D and 2D examples
